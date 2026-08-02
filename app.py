@@ -41,8 +41,8 @@ def preprocess_image(img):
     return arr
 
 
-def predict(image_bytes):
-    img = Image.open(image_bytes)
+def predict(stream):
+    img = Image.open(stream)
     arr = preprocess_image(img)
     prob = float(get_model().predict(arr, verbose=0)[0][0])
     label = CLASS_1 if prob >= 0.5 else CLASS_0
@@ -71,8 +71,9 @@ def predict_route():
         return jsonify({"error": "Tipe file tidak didukung"}), 400
     try:
         result = predict(file.stream)
-    except Exception as exc:
-        return jsonify({"error": f"Tidak dapat memproses gambar: {exc}"}), 400
+    except Exception:
+        app.logger.exception("Prediction failed")
+        return jsonify({"error": "Gagal memproses gambar"}), 400
     return jsonify(result)
 
 

@@ -16,6 +16,14 @@ Buka http://127.0.0.1:5000. Unggah gambar lalu tekan **Klasifikasi**.
 
 Endpoint: `POST /predict` dengan field multipart `file` -> JSON `{label, probability, confidence}`.
 
+## Menjalankan tes
+
+```powershell
+.\.venv\Scripts\python.exe smoke_test.py
+```
+
+Uji asap berbasis `unittest` (memuat TensorFlow, jadi butuh beberapa detik).
+
 ## Evaluasi pada dataset CIFAKE
 
 ```powershell
@@ -29,6 +37,7 @@ Perintah pertama mengunduh split test CIFAKE (~8 MB) dari Hugging Face ke `~/.ca
 - `app.py` — server Flask (unggah -> prediksi -> hasil)
 - `config.py` — konstanta bersama (preprocessing, label kelas, path model)
 - `eval_cifake.py` — skrip evaluasi pada CIFAKE test
+- `smoke_test.py` — uji asap unit (unittest standar)
 - `templates/index.html` — halaman UI (Bahasa Indonesia)
 - `model/my_model21.h5` — model Keras, input 32x32x3 RGB, output sigmoid
 

@@ -80,6 +80,8 @@ def main():
             arrs /= 255.0
         preds = model.predict(arrs, verbose=0, batch_size=BATCH_SIZE)
         probs[i : i + len(batch)] = preds[:, 0]
+        print(f"\r  Predicting {min(i + len(batch), n):,}/{n:,}", end="", flush=True)
+    print()
 
     metrics = compute_metrics(y_true, probs)
     cm = metrics["confusion_matrix"]

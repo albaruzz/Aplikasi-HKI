@@ -5,12 +5,13 @@
   `.\.venv\Scripts\python.exe` (Python 3.12.10). Never `python`/`pip` directly.
 - Recreate venv: `py -3.12 -m venv .venv` then `.\.venv\Scripts\python.exe -m pip install -r requirements.txt`
 - TensorFlow runs CPU-only on native Windows.
-- No `.gitignore` until first commit; do not commit `.venv/` or `__pycache__/`.
+- `.gitignore` excludes `.venv/`, `__pycache__/`, `*.pyc`; `.gitattributes` pins LF + marks `*.h5` binary.
 
 ## Run the app
 - Start: `.\.venv\Scripts\python.exe app.py` -> http://127.0.0.1:5000
 - `GET /` = UI; `POST /predict` = multipart field `file` -> JSON `{label, probability, confidence}`.
-- No tests/lint/typecheck. Syntax check: `.\.venv\Scripts\python.exe -m py_compile app.py eval_cifake.py`
+- Smoke tests: `.\.venv\Scripts\python.exe smoke_test.py` (stdlib unittest; loads TF, so ~seconds).
+- No lint/typecheck. Syntax check: `.\.venv\Scripts\python.exe -m py_compile app.py eval_cifake.py smoke_test.py`
 
 ## Model & preprocessing
 - `model/my_model21.h5` = Keras CNN, input 32x32x3 RGB, single sigmoid output (0=Fake, 1=Real).

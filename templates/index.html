@@ -1,15 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Klasifikasi Citra Real atau Fake</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23667eea'/><text x='50' y='70' font-size='58' text-anchor='middle' fill='white' font-family='sans-serif'>R</text></svg>">
     <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd6;
+            --primary-disabled: #b8c0f0;
+            --border: #c9cdd6;
+            --text: #1f2430;
+            --text-muted: #555c6b;
+            --success-bg: #e8f7ee;
+            --success-border: #3cba6f;
+            --success-text: #1c7c45;
+            --error-bg: #fdeeee;
+            --error-border: #e45c5c;
+            --error-text: #b33232;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 32px 16px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -20,22 +36,41 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
             padding: 40px;
             width: 420px;
-            max-width: 90vw;
+            max-width: 100%;
+            margin: auto;
             text-align: center;
         }
-        h1 { font-size: 22px; color: #222; margin-bottom: 6px; }
-        p.subtitle { color: #777; font-size: 14px; margin-bottom: 24px; }
+        h1 { font-size: 22px; color: var(--text); margin-bottom: 6px; }
+        p.subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
         .dropzone {
-            border: 2px dashed #c4c4c4;
+            display: block;
+            border: 2px dashed var(--border);
             border-radius: 12px;
             padding: 28px 16px;
-            color: #888;
+            color: var(--text-muted);
             font-size: 14px;
             cursor: pointer;
             transition: border-color 0.2s, background 0.2s;
         }
-        .dropzone:hover, .dropzone.dragover { border-color: #667eea; background: #f5f7ff; }
-        .dropzone input { display: none; }
+        .dropzone:hover, .dropzone.dragover, .dropzone:focus-within {
+            border-color: var(--primary);
+            background: #f5f7ff;
+            outline: none;
+        }
+        .dropzone:focus-visible {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.45);
+        }
+        .file-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+            border: 0;
+        }
         .preview { margin-top: 16px; }
         .preview img {
             max-width: 100%;
@@ -49,29 +84,51 @@
             padding: 12px;
             border: none;
             border-radius: 10px;
-            background: #667eea;
+            background: var(--primary);
             color: #fff;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
         }
-        button:hover { background: #5a6fd6; }
-        button:disabled { background: #b8c0f0; cursor: not-allowed; }
+        button:hover { background: var(--primary-dark); }
+        button:disabled { background: var(--primary-disabled); cursor: not-allowed; }
+        .link-btn {
+            margin-top: 12px;
+            width: auto;
+            padding: 6px 14px;
+            background: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .link-btn:hover { color: var(--error-text); background: none; text-decoration: underline; }
         .result { margin-top: 20px; padding: 16px; border-radius: 10px; display: none; }
-        .result.real { background: #e8f7ee; border: 1px solid #3cba6f; color: #1c7c45; }
-        .result.fake { background: #fdeeee; border: 1px solid #e45c5c; color: #b33232; }
+        .result.real { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-text); }
+        .result.fake { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); }
         .result h2 { font-size: 24px; margin-bottom: 4px; }
         .result p { font-size: 14px; color: inherit; opacity: 0.85; }
-        .error { margin-top: 16px; color: #b33232; font-size: 14px; display: none; }
+        .error {
+            margin-top: 16px;
+            color: var(--error-text);
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+            display: none;
+        }
         .spinner {
             display: none;
             margin: 20px auto 0;
             width: 34px; height: 34px;
             border: 4px solid #e0e0e0;
-            border-top-color: #667eea;
+            border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .spinner { animation-duration: 2s; }
         }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -81,27 +138,36 @@
         <h1>Klasifikasi Citra Real atau Fake</h1>
         <p class="subtitle">Unggah gambar untuk diklasifikasikan oleh model</p>
 
-        <div class="dropzone" id="dropzone">
-            <input type="file" id="fileInput" accept="image/*">
+        <label class="dropzone" id="dropzone" for="fileInput">
+            <input type="file" id="fileInput" class="file-input" accept="image/*">
             <span>Klik di sini atau letakkan gambar</span>
-        </div>
+        </label>
 
         <div class="preview" id="preview"></div>
 
         <button id="classifyBtn" disabled>Klasifikasi</button>
-        <div class="spinner" id="spinner"></div>
-        <div class="error" id="error"></div>
-        <div class="result" id="result">
+        <button id="resetBtn" class="link-btn" style="display:none">Hapus gambar</button>
+        <div class="spinner" id="spinner" aria-hidden="true"></div>
+        <div class="error" id="error" role="alert"></div>
+        <div class="result" id="result" role="status" aria-live="polite">
             <h2 id="resultLabel"></h2>
             <p id="resultConf"></p>
         </div>
     </div>
 
+    <noscript>
+        <p style="text-align:center; padding:20px; color:#fff; font-family:sans-serif;">
+            Aplikasi ini memerlukan JavaScript untuk berjalan.
+        </p>
+    </noscript>
+
     <script>
+        const MAX_BYTES = 5 * 1024 * 1024;
         const dropzone = document.getElementById("dropzone");
         const fileInput = document.getElementById("fileInput");
         const preview = document.getElementById("preview");
         const classifyBtn = document.getElementById("classifyBtn");
+        const resetBtn = document.getElementById("resetBtn");
         const spinner = document.getElementById("spinner");
         const errorBox = document.getElementById("error");
         const result = document.getElementById("result");
@@ -109,36 +175,86 @@
         const resultConf = document.getElementById("resultConf");
 
         let selectedFile = null;
+        let previewURL = null;
+        let dragDepth = 0;
 
-        dropzone.addEventListener("click", () => fileInput.click());
-        dropzone.addEventListener("dragover", (e) => {
+        window.addEventListener("dragover", (e) => e.preventDefault());
+        window.addEventListener("drop", (e) => e.preventDefault());
+
+        dropzone.addEventListener("dragenter", (e) => {
             e.preventDefault();
+            dragDepth++;
             dropzone.classList.add("dragover");
         });
-        dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+        dropzone.addEventListener("dragover", (e) => e.preventDefault());
+        dropzone.addEventListener("dragleave", () => {
+            dragDepth = Math.max(0, dragDepth - 1);
+            if (dragDepth === 0) dropzone.classList.remove("dragover");
+        });
         dropzone.addEventListener("drop", (e) => {
             e.preventDefault();
+            dragDepth = 0;
             dropzone.classList.remove("dragover");
             if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                fileInput.click();
+            }
         });
         fileInput.addEventListener("change", () => {
             if (fileInput.files.length) handleFile(fileInput.files[0]);
         });
 
+        function clearPreview() {
+            if (previewURL) {
+                URL.revokeObjectURL(previewURL);
+                previewURL = null;
+            }
+            preview.innerHTML = "";
+        }
+
+        function showError(msg) {
+            errorBox.textContent = msg;
+            errorBox.style.display = "block";
+        }
+
+        function resetAll() {
+            selectedFile = null;
+            clearPreview();
+            result.style.display = "none";
+            errorBox.style.display = "none";
+            classifyBtn.disabled = true;
+            resetBtn.style.display = "none";
+        }
+
         function handleFile(file) {
+            if (file.size > MAX_BYTES) {
+                resetAll();
+                showError("Ukuran file melebihi batas maksimal (5 MB).");
+                return;
+            }
             selectedFile = file;
             result.style.display = "none";
             errorBox.style.display = "none";
-            preview.innerHTML = "";
+            resetBtn.style.display = "inline-block";
+            clearPreview();
+            previewURL = URL.createObjectURL(file);
             const img = document.createElement("img");
-            img.src = URL.createObjectURL(file);
+            img.src = previewURL;
+            img.alt = "Pratinjau gambar yang dipilih";
             preview.appendChild(img);
             classifyBtn.disabled = false;
         }
 
+        resetBtn.addEventListener("click", resetAll);
+
         classifyBtn.addEventListener("click", async () => {
             if (!selectedFile) return;
             classifyBtn.disabled = true;
+            classifyBtn.textContent = "Memproses\u2026";
             spinner.style.display = "block";
             errorBox.style.display = "none";
             result.style.display = "none";
@@ -152,15 +268,15 @@
                 try { data = await res.json(); } catch (e) { data = {}; }
                 if (!res.ok) throw new Error(data.error || "Prediksi gagal");
                 resultLabel.textContent = data.label;
-                resultConf.textContent = "Tingkat keyakinan: " + (data.confidence * 100).toFixed(2) + "%";
+                resultConf.textContent = "Tingkat keyakinan: " + ((data.confidence ?? 0) * 100).toFixed(2) + "%";
                 result.className = "result " + data.label.toLowerCase();
                 result.style.display = "block";
             } catch (err) {
-                errorBox.textContent = err.message;
-                errorBox.style.display = "block";
+                showError(err.message);
             } finally {
                 spinner.style.display = "none";
                 classifyBtn.disabled = false;
+                classifyBtn.textContent = "Klasifikasi";
             }
         });
     </script>
