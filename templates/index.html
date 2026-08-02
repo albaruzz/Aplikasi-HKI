@@ -4,26 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Klasifikasi Citra Real atau Fake</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23667eea'/><text x='50' y='70' font-size='58' text-anchor='middle' fill='white' font-family='sans-serif'>R</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0a0a'/><text x='50' y='70' font-size='58' text-anchor='middle' fill='white' font-family='sans-serif'>R</text></svg>">
     <style>
         :root {
-            --primary: #667eea;
-            --primary-dark: #5a6fd6;
-            --primary-disabled: #b8c0f0;
-            --border: #c9cdd6;
-            --text: #1f2430;
-            --text-muted: #555c6b;
-            --success-bg: #e8f7ee;
-            --success-border: #3cba6f;
-            --success-text: #1c7c45;
-            --error-bg: #fdeeee;
-            --error-border: #e45c5c;
-            --error-text: #b33232;
+            color-scheme: light dark;
+            --bg: #f4f4f5;
+            --surface: #ffffff;
+            --ink: #0a0a0a;
+            --ink-soft: #52525b;
+            --ink-faint: #8a8a93;
+            --line: #e4e4e7;
+            --line-strong: #d4d4d8;
+            --overlay: rgba(0, 0, 0, 0.05);
+            --ring: rgba(10, 10, 10, 0.28);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0a0a0a;
+                --surface: #131316;
+                --ink: #f4f4f5;
+                --ink-soft: #a1a1aa;
+                --ink-faint: #71717a;
+                --line: #26262b;
+                --line-strong: #3f3f46;
+                --overlay: rgba(255, 255, 255, 0.06);
+                --ring: rgba(244, 244, 245, 0.28);
+            }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
+            color: var(--ink);
+            background:
+                radial-gradient(1200px 600px at 50% -10%, var(--overlay), transparent 70%),
+                var(--bg);
             min-height: 100vh;
             padding: 32px 16px;
             display: flex;
@@ -31,35 +45,50 @@
             justify-content: center;
         }
         .card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-            padding: 40px;
-            width: 420px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.06);
+            padding: 44px 40px 40px;
+            width: 460px;
             max-width: 100%;
             margin: auto;
             text-align: center;
         }
-        h1 { font-size: 22px; color: var(--text); margin-bottom: 6px; }
-        p.subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+        .eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 12px;
+        }
+        h1 { font-size: 24px; line-height: 1.2; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 8px; }
+        p.subtitle { color: var(--ink-soft); font-size: 14px; margin-bottom: 32px; }
+
         .dropzone {
-            display: block;
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 28px 16px;
-            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            border: 1.5px dashed var(--line-strong);
+            border-radius: 16px;
+            padding: 36px 20px;
+            color: var(--ink-soft);
             font-size: 14px;
             cursor: pointer;
-            transition: border-color 0.2s, background 0.2s;
+            transition: border-color 0.18s, background 0.18s, color 0.18s;
         }
-        .dropzone:hover, .dropzone.dragover, .dropzone:focus-within {
-            border-color: var(--primary);
-            background: #f5f7ff;
-            outline: none;
+        .dropzone svg { color: var(--ink-faint); transition: color 0.18s; }
+        .dropzone:hover { border-color: var(--ink); color: var(--ink); }
+        .dropzone:hover svg { color: var(--ink); }
+        .dropzone.dragover, .dropzone:focus-within {
+            border-color: var(--ink);
+            background: var(--ink);
+            color: #fff;
         }
-        .dropzone:focus-visible {
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.45);
-        }
+        .dropzone.dragover svg, .dropzone:focus-within svg { color: #fff; }
+        .dropzone:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--ring); }
         .file-input {
             position: absolute;
             width: 1px;
@@ -71,92 +100,138 @@
             white-space: nowrap;
             border: 0;
         }
-        .preview { margin-top: 16px; }
+
+        .preview { margin-top: 20px; }
         .preview img {
+            display: block;
             max-width: 100%;
             max-height: 220px;
-            border-radius: 10px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            margin: 0 auto;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            object-fit: contain;
         }
+        .preview .meta { margin-top: 10px; font-size: 12px; color: var(--ink-faint); }
+
         button {
             margin-top: 20px;
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             border: none;
-            border-radius: 10px;
-            background: var(--primary);
-            color: #fff;
-            font-size: 16px;
+            border-radius: 12px;
+            background: var(--ink);
+            color: var(--surface);
+            font-size: 15px;
             font-weight: 600;
+            letter-spacing: 0.01em;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: opacity 0.18s, transform 0.06s;
         }
-        button:hover { background: var(--primary-dark); }
-        button:disabled { background: var(--primary-disabled); cursor: not-allowed; }
+        button:hover { opacity: 0.85; }
+        button:active { transform: scale(0.985); }
+        button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+        button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
         .link-btn {
-            margin-top: 12px;
+            margin-top: 14px;
             width: auto;
-            padding: 6px 14px;
+            padding: 4px 8px;
             background: none;
-            color: var(--text-muted);
+            color: var(--ink-soft);
             font-size: 13px;
             font-weight: 500;
+            letter-spacing: 0;
         }
-        .link-btn:hover { color: var(--error-text); background: none; text-decoration: underline; }
-        .result { margin-top: 20px; padding: 16px; border-radius: 10px; display: none; }
-        .result.real { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-text); }
-        .result.fake { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); }
-        .result h2 { font-size: 24px; margin-bottom: 4px; }
-        .result p { font-size: 14px; color: inherit; opacity: 0.85; }
-        .error {
-            margin-top: 16px;
-            color: var(--error-text);
-            background: var(--error-bg);
-            border: 1px solid var(--error-border);
-            border-radius: 8px;
-            padding: 10px;
-            font-size: 14px;
-            display: none;
-        }
+        .link-btn:hover { opacity: 1; color: var(--ink); text-decoration: underline; }
+
         .spinner {
             display: none;
-            margin: 20px auto 0;
-            width: 34px; height: 34px;
-            border: 4px solid #e0e0e0;
-            border-top-color: var(--primary);
+            margin: 24px auto 0;
+            width: 28px; height: 28px;
+            border: 3px solid var(--line-strong);
+            border-top-color: var(--ink);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.7s linear infinite;
         }
         @media (prefers-reduced-motion: reduce) {
             .spinner { animation-duration: 2s; }
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .result {
+            margin-top: 24px;
+            padding: 20px;
+            border: 1px solid var(--line-strong);
+            border-radius: 16px;
+            background: var(--bg);
+            display: none;
+        }
+        .result .row { display: flex; align-items: center; gap: 14px; text-align: left; }
+        .result .icon {
+            flex: none;
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            border: 1.5px solid var(--ink);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .result .icon svg { color: var(--ink); }
+        .result .icon.hidden { display: none; }
+        .result h2 { font-size: 20px; letter-spacing: -0.01em; color: var(--ink); }
+        .result p { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+
+        .error {
+            margin-top: 18px;
+            color: var(--ink);
+            background: var(--bg);
+            border: 1px solid var(--line-strong);
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 13px;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="card">
+        <p class="eyebrow">Deteksi Gambar</p>
         <h1>Klasifikasi Citra Real atau Fake</h1>
         <p class="subtitle">Unggah gambar untuk diklasifikasikan oleh model</p>
 
         <label class="dropzone" id="dropzone" for="fileInput">
             <input type="file" id="fileInput" class="file-input" accept="image/*">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="28" height="28" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
             <span>Klik di sini atau letakkan gambar</span>
         </label>
 
-        <div class="preview" id="preview"></div>
+        <div class="preview" id="preview">
+            <p class="meta" id="fileMeta" style="display:none"></p>
+        </div>
 
         <button id="classifyBtn" disabled>Klasifikasi</button>
         <button id="resetBtn" class="link-btn" style="display:none">Hapus gambar</button>
         <div class="spinner" id="spinner" aria-hidden="true"></div>
         <div class="error" id="error" role="alert"></div>
         <div class="result" id="result" role="status" aria-live="polite">
-            <h2 id="resultLabel"></h2>
-            <p id="resultConf"></p>
+            <div class="row">
+                <span class="icon" id="iconReal" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="icon hidden" id="iconFake" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </span>
+                <div>
+                    <h2 id="resultLabel"></h2>
+                    <p id="resultConf"></p>
+                </div>
+            </div>
         </div>
     </div>
 
     <noscript>
-        <p style="text-align:center; padding:20px; color:#fff; font-family:sans-serif;">
+        <p style="text-align:center; padding:20px; color:var(--ink); font-family:sans-serif;">
             Aplikasi ini memerlukan JavaScript untuk berjalan.
         </p>
     </noscript>
@@ -166,6 +241,7 @@
         const dropzone = document.getElementById("dropzone");
         const fileInput = document.getElementById("fileInput");
         const preview = document.getElementById("preview");
+        const fileMeta = document.getElementById("fileMeta");
         const classifyBtn = document.getElementById("classifyBtn");
         const resetBtn = document.getElementById("resetBtn");
         const spinner = document.getElementById("spinner");
@@ -173,6 +249,8 @@
         const result = document.getElementById("result");
         const resultLabel = document.getElementById("resultLabel");
         const resultConf = document.getElementById("resultConf");
+        const iconReal = document.getElementById("iconReal");
+        const iconFake = document.getElementById("iconFake");
 
         let selectedFile = null;
         let previewURL = null;
@@ -208,12 +286,19 @@
             if (fileInput.files.length) handleFile(fileInput.files[0]);
         });
 
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + " B";
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+            return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+        }
+
         function clearPreview() {
             if (previewURL) {
                 URL.revokeObjectURL(previewURL);
                 previewURL = null;
             }
-            preview.innerHTML = "";
+            preview.querySelectorAll("img").forEach((img) => img.remove());
+            fileMeta.style.display = "none";
         }
 
         function showError(msg) {
@@ -245,7 +330,9 @@
             const img = document.createElement("img");
             img.src = previewURL;
             img.alt = "Pratinjau gambar yang dipilih";
-            preview.appendChild(img);
+            preview.prepend(img);
+            fileMeta.textContent = file.name + " · " + formatSize(file.size);
+            fileMeta.style.display = "block";
             classifyBtn.disabled = false;
         }
 
@@ -269,7 +356,9 @@
                 if (!res.ok) throw new Error(data.error || "Prediksi gagal");
                 resultLabel.textContent = data.label;
                 resultConf.textContent = "Tingkat keyakinan: " + ((data.confidence ?? 0) * 100).toFixed(2) + "%";
-                result.className = "result " + data.label.toLowerCase();
+                const isReal = data.label === "Real";
+                iconReal.classList.toggle("hidden", !isReal);
+                iconFake.classList.toggle("hidden", isReal);
                 result.style.display = "block";
             } catch (err) {
                 showError(err.message);
