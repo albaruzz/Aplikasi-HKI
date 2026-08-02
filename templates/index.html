@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Klasifikasi Citra Real atau Fake</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0a0a'/><text x='50' y='70' font-size='58' text-anchor='middle' fill='white' font-family='sans-serif'>R</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%235b5bd6'/><text x='50' y='70' font-size='58' text-anchor='middle' fill='white' font-family='sans-serif'>R</text></svg>">
     <style>
         :root {
             color-scheme: light dark;
-            --bg: #f4f4f5;
+            --bg: #f4f4f6;
             --surface: #ffffff;
             --ink: #0a0a0a;
             --ink-soft: #52525b;
@@ -17,10 +17,20 @@
             --line-strong: #d4d4d8;
             --overlay: rgba(0, 0, 0, 0.05);
             --ring: rgba(10, 10, 10, 0.28);
+            --accent: #5b5bd6;
+            --accent-strong: #4545c2;
+            --accent-soft: rgba(91, 91, 214, 0.10);
+            --accent-ring: rgba(91, 91, 214, 0.30);
+            --success: #128a4e;
+            --success-soft: rgba(18, 138, 78, 0.10);
+            --success-line: rgba(18, 138, 78, 0.35);
+            --danger: #c92a2a;
+            --danger-soft: rgba(201, 42, 42, 0.08);
+            --danger-line: rgba(201, 42, 42, 0.35);
         }
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg: #0a0a0a;
+                --bg: #0a0a0b;
                 --surface: #131316;
                 --ink: #f4f4f5;
                 --ink-soft: #a1a1aa;
@@ -29,6 +39,16 @@
                 --line-strong: #3f3f46;
                 --overlay: rgba(255, 255, 255, 0.06);
                 --ring: rgba(244, 244, 245, 0.28);
+                --accent: #9c9cf0;
+                --accent-strong: #b0b0f6;
+                --accent-soft: rgba(156, 156, 240, 0.14);
+                --accent-ring: rgba(156, 156, 240, 0.35);
+                --success: #4cd58a;
+                --success-soft: rgba(76, 213, 138, 0.12);
+                --success-line: rgba(76, 213, 138, 0.45);
+                --danger: #ff7a7a;
+                --danger-soft: rgba(255, 122, 122, 0.12);
+                --danger-line: rgba(255, 122, 122, 0.45);
             }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,7 +56,7 @@
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
             color: var(--ink);
             background:
-                radial-gradient(1200px 600px at 50% -10%, var(--overlay), transparent 70%),
+                radial-gradient(900px 480px at 50% -8%, var(--accent-soft), transparent 70%),
                 var(--bg);
             min-height: 100vh;
             padding: 32px 16px;
@@ -60,7 +80,7 @@
             font-weight: 700;
             letter-spacing: 0.22em;
             text-transform: uppercase;
-            color: var(--ink-faint);
+            color: var(--accent);
             margin-bottom: 12px;
         }
         h1 { font-size: 24px; line-height: 1.2; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 8px; }
@@ -80,15 +100,15 @@
             transition: border-color 0.18s, background 0.18s, color 0.18s;
         }
         .dropzone svg { color: var(--ink-faint); transition: color 0.18s; }
-        .dropzone:hover { border-color: var(--ink); color: var(--ink); }
-        .dropzone:hover svg { color: var(--ink); }
+        .dropzone:hover { border-color: var(--accent); color: var(--accent); }
+        .dropzone:hover svg { color: var(--accent); }
         .dropzone.dragover, .dropzone:focus-within {
-            border-color: var(--ink);
-            background: var(--ink);
+            border-color: var(--accent);
+            background: var(--accent);
             color: #fff;
         }
         .dropzone.dragover svg, .dropzone:focus-within svg { color: #fff; }
-        .dropzone:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--ring); }
+        .dropzone:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--accent-ring); }
         .file-input {
             position: absolute;
             width: 1px;
@@ -119,18 +139,18 @@
             padding: 13px;
             border: none;
             border-radius: 12px;
-            background: var(--ink);
-            color: var(--surface);
+            background: var(--accent);
+            color: #fff;
             font-size: 15px;
             font-weight: 600;
             letter-spacing: 0.01em;
             cursor: pointer;
-            transition: opacity 0.18s, transform 0.06s;
+            transition: background 0.18s, transform 0.06s;
         }
-        button:hover { opacity: 0.85; }
+        button:hover { background: var(--accent-strong); }
         button:active { transform: scale(0.985); }
         button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-        button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+        button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
         .link-btn {
             margin-top: 14px;
             width: auto;
@@ -141,14 +161,14 @@
             font-weight: 500;
             letter-spacing: 0;
         }
-        .link-btn:hover { opacity: 1; color: var(--ink); text-decoration: underline; }
+        .link-btn:hover { opacity: 1; color: var(--accent); text-decoration: underline; }
 
         .spinner {
             display: none;
             margin: 24px auto 0;
             width: 28px; height: 28px;
             border: 3px solid var(--line-strong);
-            border-top-color: var(--ink);
+            border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
@@ -165,6 +185,8 @@
             background: var(--bg);
             display: none;
         }
+        .result.real { background: var(--success-soft); border-color: var(--success-line); }
+        .result.fake { background: var(--danger-soft); border-color: var(--danger-line); }
         .result .row { display: flex; align-items: center; gap: 14px; text-align: left; }
         .result .icon {
             flex: none;
@@ -173,9 +195,13 @@
             border: 1.5px solid var(--ink);
             display: flex; align-items: center; justify-content: center;
         }
-        .result .icon svg { color: var(--ink); }
+        .result.real .icon { color: var(--success); border-color: var(--success); }
+        .result.fake .icon { color: var(--danger); border-color: var(--danger); }
+        .result .icon svg { color: currentColor; }
         .result .icon.hidden { display: none; }
         .result h2 { font-size: 20px; letter-spacing: -0.01em; color: var(--ink); }
+        .result.real h2 { color: var(--success); }
+        .result.fake h2 { color: var(--danger); }
         .result p { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
 
         .error {
@@ -359,6 +385,8 @@
                 const isReal = data.label === "Real";
                 iconReal.classList.toggle("hidden", !isReal);
                 iconFake.classList.toggle("hidden", isReal);
+                result.classList.remove("real", "fake");
+                result.classList.add(data.label.toLowerCase());
                 result.style.display = "block";
             } catch (err) {
                 showError(err.message);
