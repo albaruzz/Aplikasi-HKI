@@ -1,3 +1,44 @@
-.venv/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+.env
+.env.*
+
+# Flask / logs
+*.log
+nohup.out
+instance/
+uploads/
+
+# Testing / tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# HuggingFace cache (eval_cifake downloads to ~/.cache, not project - ignore if ever local)
+.cache/
+hf_cache/

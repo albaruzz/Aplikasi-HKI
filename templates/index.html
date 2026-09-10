@@ -27,11 +27,13 @@
             --danger: #c92a2a;
             --danger-soft: rgba(201, 42, 42, 0.08);
             --danger-line: rgba(201, 42, 42, 0.35);
+            --page-bg: radial-gradient(900px 480px at 50% -8%, var(--accent-soft), transparent 70%);
+            --grain-opacity: 0.03;
         }
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg: #0a0a0b;
-                --surface: #131316;
+                --bg: #0d0d14;
+                --surface: #15151b;
                 --ink: #f4f4f5;
                 --ink-soft: #a1a1aa;
                 --ink-faint: #71717a;
@@ -49,6 +51,11 @@
                 --danger: #ff7a7a;
                 --danger-soft: rgba(255, 122, 122, 0.12);
                 --danger-line: rgba(255, 122, 122, 0.45);
+                --page-bg:
+                    radial-gradient(1100px 700px at 18% -10%, rgba(156, 156, 240, 0.16), transparent 60%),
+                    radial-gradient(900px 600px at 92% 112%, rgba(124, 82, 204, 0.13), transparent 60%),
+                    linear-gradient(160deg, #0d0d16 0%, #12101e 55%, #0a0a10 100%);
+                --grain-opacity: 0.05;
             }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -56,7 +63,7 @@
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
             color: var(--ink);
             background:
-                radial-gradient(900px 480px at 50% -8%, var(--accent-soft), transparent 70%),
+                var(--page-bg),
                 var(--bg);
             min-height: 100vh;
             padding: 32px 16px;
@@ -64,7 +71,20 @@
             align-items: center;
             justify-content: center;
         }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: var(--grain-opacity);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 180px 180px;
+            mix-blend-mode: overlay;
+        }
         .card {
+            position: relative;
+            z-index: 1;
             background: var(--surface);
             border: 1px solid var(--line);
             border-radius: 24px;
